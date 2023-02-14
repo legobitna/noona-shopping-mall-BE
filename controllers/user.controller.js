@@ -5,6 +5,7 @@ userController.createUser = async (req, res) => {
   try {
     let { email, password, name, level } = req.body;
     const user = await User.findOne({ email });
+
     if (user) {
       throw new Error("User already exist");
     }
@@ -22,7 +23,7 @@ userController.loginWithEmail = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }, "-updatedAt -createdAt -__v");
-
+    console.log("usr", user);
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
@@ -31,7 +32,7 @@ userController.loginWithEmail = async (req, res) => {
       }
     }
 
-    throw new Error("invalid password");
+    throw new Error("invalid email or password");
   } catch (error) {
     return res.status(400).json({ status: "fail", error: error.message });
   }

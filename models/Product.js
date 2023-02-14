@@ -4,13 +4,12 @@ const productSchema = Schema(
   {
     sku: { type: String, required: true, unique: true },
     name: { type: String, required: true },
-    size: { type: Array },
     image: { type: String },
     category: { type: Array },
     description: { type: String },
     price: { type: Number, required: true },
     stock: { type: Object },
-    status: { type: String, default: "preparing" },
+    status: { type: String, default: "active" },
   },
   { timestamps: true }
 );

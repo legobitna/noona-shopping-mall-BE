@@ -1,7 +1,7 @@
 const Product = require("../models/Product");
 
 const productController = {};
-
+const PAGE_SIZE = 5;
 productController.createProduct = async (req, res) => {
   try {
     const {
@@ -34,8 +34,22 @@ productController.createProduct = async (req, res) => {
 };
 productController.getProducts = async (req, res) => {
   try {
-    const productList = await Product.find({});
-    res.status(200).json({ status: "success", data: productList });
+    const { page, name } = req.query;
+    console.log("ddd", name);
+    const productList = await Product.find({
+      name: { $regex: name, $options: "i" },
+    }) // sku 문자가 없으면? 문자 포함은?
+      .skip((page - 1) * PAGE_SIZE)
+      .limit(5);
+    const totalItemNum = await Product.find({
+      name: { $regex: name, $options: "i" },
+    }).count();
+
+    const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+
+    res
+      .status(200)
+      .json({ status: "success", data: productList, totalPageNum });
   } catch (error) {
     return res.status(400).json({ status: "fail", error: error.message });
   }
@@ -88,7 +102,7 @@ productController.updateProduct = async (req, res) => {
   }
 };
 
-productController.deleteProduct = async () => {
+productController.deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const product = await Product.findByIdAndDelete(productId);
